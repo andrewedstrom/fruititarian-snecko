@@ -38,16 +38,16 @@ end
 function _draw()
     cls()
     if game_state=="menu" then
-        centered_print("fruititarian snecko",board_length*grid_size/2,board_length*grid_size/4,7,6)
-        centered_print("press \x97 to play", board_length*grid_size/2, 3*board_length*grid_size/4, 7, 6)
+        centered_print("fruititarian snecko",board_length*grid_size/2,board_length*grid_size/4,11,1)
+        centered_print("press \x97 to play", board_length*grid_size/2, 3*board_length*grid_size/4, 7, 1)
     else
         player:draw()
         fruit:draw()
         draw_board()
         if game_state=="game-over" then
-            centered_print("game over",board_length*grid_size/2,board_length*grid_size/4,7,6)
-            centered_print("final tail length was "..player.tail_length,board_length*grid_size/2,board_length*grid_size/4 +16,7,6)
-            centered_print("press \x97 to try again", board_length*grid_size/2, 3*board_length*grid_size/4, 7, 6)
+            centered_print("game over",board_length*grid_size/2,board_length*grid_size/4,7,1)
+            centered_print("final tail length:"..player.tail_length,board_length*grid_size/2,board_length*grid_size/4 +16,11,1)
+            centered_print("press \x97 to try again", board_length*grid_size/2, 3*board_length*grid_size/4, 7, 1)
         end
     end
 end
@@ -169,12 +169,12 @@ function draw_block(x,y,col)
 end
 
 function draw_board()
-    rect(1,1,(board_length*grid_size)+1,(board_length*grid_size)+1,7)
+    rect(0,0,(board_length*grid_size)+2,(board_length*grid_size)+2,7)
 end
 
 -- fancy printing
-function centered_print(text,x,y,col)
-    outlined_print(text, x-#text*2, y, col, 5)
+function centered_print(text,x,y,col,outline_col)
+    outlined_print(text, x-#text*2, y, col, outline_col)
 end
 
 function outlined_print(text,x,y,col,outline_col)
