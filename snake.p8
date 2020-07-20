@@ -1,7 +1,7 @@
 pico-8 cartridge // http://www.pico-8.com
 version 29
 __lua__
---pico snake
+--fruititarian snecko
 --by andrew edstrom 
 
 local player
@@ -10,10 +10,10 @@ local grid_size=8
 local frames
 local tails
 local fruit
-local game_over
+local game_state -- "menu", "playing", "game-over"
 
 function _init()
-    new_game()
+    game_state="menu"
 end
 
 function new_game()
@@ -21,11 +21,11 @@ function new_game()
     frames=0
     player=make_player()
     fruit=new_fruit()
-    game_over=false
+    game_state="playing"
 end
 
 function _update()
-    if not game_over then
+    if game_state == "playing" then
         frames+=1
         player:update()
     else
@@ -37,13 +37,18 @@ end
 
 function _draw()
     cls()
-    player:draw()
-    fruit:draw()
-    draw_board()
-    if game_over then
-        centered_print("game over",board_length*grid_size/2,board_length*grid_size/4,7,6)
-        centered_print("final tail length was "..player.tail_length,board_length*grid_size/2,board_length*grid_size/4 +16,7,6)
-        centered_print("press \x97 to try again", board_length*grid_size/2, 3*board_length*grid_size/4, 7, 6)
+    if game_state=="menu" then
+        centered_print("fruititarian snecko",board_length*grid_size/2,board_length*grid_size/4,7,6)
+        centered_print("press \x97 to play", board_length*grid_size/2, 3*board_length*grid_size/4, 7, 6)
+    else
+        player:draw()
+        fruit:draw()
+        draw_board()
+        if game_state=="game-over" then
+            centered_print("game over",board_length*grid_size/2,board_length*grid_size/4,7,6)
+            centered_print("final tail length was "..player.tail_length,board_length*grid_size/2,board_length*grid_size/4 +16,7,6)
+            centered_print("press \x97 to try again", board_length*grid_size/2, 3*board_length*grid_size/4, 7, 6)
+        end
     end
 end
 
@@ -59,6 +64,7 @@ function make_player()
         {x=10,y=8},
         {x=10,y=9}
       },
+      update_frequency=10,
       draw=function(self)
         for block in all(self.tail_blocks) do
             draw_block(block.x,block.y,3)
@@ -66,7 +72,7 @@ function make_player()
         draw_block(self.x,self.y,11)
       end,
       update=function(self)
-        if frames % 5 == 0 then
+        if frames % 9 == 0 then
             frames=0
             add(self.tail_blocks,{x=self.x,y=self.y})
             if #self.tail_blocks>self.tail_length then
@@ -78,6 +84,9 @@ function make_player()
                 sfx(0)
                 self.tail_length+=1
                 fruit=new_fruit()
+                if self.tail_length % 10 == 0 then
+                    self.update_frequency-=1 
+                end
             end
 
             for block in all(self.tail_blocks) do
@@ -114,7 +123,7 @@ function make_player()
 end
 
 function lose()
-    game_over=true
+    game_state="game-over"
     sfx(1)
 end
 
