@@ -14,7 +14,30 @@ local game_over=false
 
 function _init()
     frames=0
-    player={
+    player=make_player()
+    apple=new_apple()
+end
+
+function _update()
+    if not game_over then
+        frames+=1
+        player:update()
+    end
+end
+
+function _draw()
+    cls()
+    player:draw()
+    apple:draw()
+    draw_board()
+    if game_over then
+        centered_print("game over",board_length*grid_size/2,board_length*grid_size/3,7,5)
+        centered_print("final tail length was "..player.tail_length,board_length*grid_size/2,2*board_length*grid_size/3,7,5)
+    end
+end
+
+function make_player()
+    return {
       x=10,
       y=10,
       dx=0,
@@ -34,6 +57,7 @@ function _init()
       end,
       update=function(self)
         if frames % 10 == 0 then
+            frames=0
             add(self.tail_blocks,{x=self.x,y=self.y})
             if #self.tail_blocks>self.tail_length then
                 del(self.tail_blocks,self.tail_blocks[1])
@@ -48,12 +72,12 @@ function _init()
 
             for block in all(self.tail_blocks) do
                 if block.x == self.x and block.y== self.y then
-                    game_over=true
+                    lose()
                 end
             end
 
             if self.x<0 or self.y<0 or self.x==board_length or self.y==board_length then
-                game_over=true
+                lose()
             end
         end
         self:handle_input()
@@ -77,8 +101,11 @@ function _init()
         end
       end
     }
+end
 
-    apple=new_apple()
+function lose()
+    game_over=true
+    sfx(1)
 end
 
 function new_apple()
@@ -115,24 +142,6 @@ function draw_block(x,y,col)
     col) 
 end
 
-function _update()
-    if not game_over then
-        frames+=1
-        player:update()
-    end
-end
-
-function _draw()
-    cls()
-    player:draw()
-    apple:draw()
-    draw_board()
-    if game_over then
-        centered_print("game over",board_length*grid_size/2,board_length*grid_size/3,7,5)
-        centered_print("final tail length was "..player.tail_length,board_length*grid_size/2,2*board_length*grid_size/3,7,5)
-    end
-end
-
 function draw_board()
     rect(1,1,(board_length*grid_size)+1,(board_length*grid_size)+1,7)
 end
@@ -162,3 +171,4 @@ __gfx__
 00000000002222000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 __sfx__
 01040000180501c0501f0502405000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+010e00001305012040110401003011050100400f0400e030100500f0400e0400d0300904109053000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
